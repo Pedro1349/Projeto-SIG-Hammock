@@ -30,6 +30,8 @@ char tela_de_equipe(void) {
     printf("║       GitHub: GabrielVictor7                                          ║\n");
     printf("║      Pedro Lucas                                                      ║\n");
     printf("║       GitHub: Pedro1349                                               ║\n");
+    printf("║      Leonardo Breno                                                   ║\n");
+    printf("║       GitHub: leonardobreno                                           ║\n");
     printf("║                                                                       ║\n");
     printf("║   Com a supervisão do Gerente                                         ║\n");
     printf("║      Flavius Gorgonio                                                 ║\n");

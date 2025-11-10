@@ -9,6 +9,8 @@
 
 FILE * arquivo_cliente; //Apontador do arquivo
 
+#define MAX_CLIENTES 100
+
 void modulo_clientes(void){
     char opcao;
 
