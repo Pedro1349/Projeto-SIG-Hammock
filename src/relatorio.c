@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../include/relatorio.h"
 #include "../include/utilidades.h"
 #include "../include/clientes.h"
@@ -95,7 +96,10 @@ void navegacao_relatorios_pedidos(void) {
                 break;
             case '2':   
                 listar_pedidos_inativos();
-                break;       
+                break;  
+            case '3':
+                filtrar_pedidos_data();
+                break;     
         }
     } while (opcao != '0');
 }
@@ -195,6 +199,7 @@ char tela_relatorio_pedidos(void){
     printf("║                                                 ║\n");
     printf("║ 1 - Listar pedidos ativos                       ║\n");
     printf("║ 2 - Listar pedidos inativos                     ║\n");
+    printf("║ 3 - Filtrar pedidos por período                 ║\n");
     printf("║                                                 ║\n");
     printf("╠═════════════════════════════════════════════════╣\n");
     printf("║ 0 - Voltar                                      ║\n");
@@ -571,4 +576,95 @@ void filtrar_produtos_preco(void) {
             prod_encontrado ++;
         }
     }
+    fclose(arquivo);
+    free(prod);
+}
+
+//filtrar pedidos por data
+
+void filtrar_pedidos_data(void) {
+    Pedido* pedido;
+    pedido = (Pedido*) malloc(sizeof(Pedido));
+    int pedido_encontrado = 1;
+
+    char data_minima [26];
+    char *dia_minimo;
+    char *mes_minimo;
+    char *ano_minimo;
+    int data_minima_int = 0;
+
+    char data_maxima [26];
+    char *dia_maximo;
+    char *mes_maximo;
+    char *ano_maximo;
+    int data_maxima_int = 0;
+
+    char *dia_pedido;
+    char *mes_pedido;
+    char *ano_pedido;
+    int data_pedido_int = 0;
+
+    char data_copia [26];
+
+
+    system("clear || cls");
+    printf("╔═════════════════════════════════════════════════╗\n");
+    printf("║           Filtrar Pedidos por período           ║\n");
+    printf("╚═════════════════════════════════════════════════╝\n");
+
+    arquivo = fopen("database/pedidos.dat", "rb");
+    if (arquivo == NULL) {
+        printf("\nNenhum pedido encontrado (arquivo inexistente).\n");
+        getchar();
+        free(pedido);
+        return;
+    }
+
+    do {
+        printf("\nDigite a data mínima do pedido: ");
+        scanf("%[^\n]", data_minima);
+        limpar_buffer();
+    } while (validar_data(data_minima) == 0);
+
+    dia_minimo = strtok(data_minima, "/");
+    mes_minimo = strtok(NULL, "/");
+    ano_minimo = strtok(NULL, "/");
+    data_minima_int = atoi(ano_minimo) * 10000 + atoi(mes_minimo) * 100 + atoi(dia_minimo);
+
+    
+
+    do {
+        printf("\nAgora, digite a data máxima do pedido: ");
+        scanf("%[^\n]", data_maxima);
+        limpar_buffer();
+    } while (validar_data(data_maxima) == 0);
+
+    dia_maximo = strtok(data_maxima, "/");
+    mes_maximo = strtok(NULL, "/");
+    ano_maximo = strtok(NULL, "/");
+    data_maxima_int = atoi(ano_maximo) * 10000 + atoi(mes_maximo) * 100 + atoi(dia_maximo);
+
+
+    while (fread(pedido, sizeof(Pedido), 1, arquivo)) {
+        strcpy(data_copia, pedido->data);
+        dia_pedido = strtok(data_copia, "/");
+        mes_pedido = strtok(NULL, "/");
+        ano_pedido = strtok(NULL, "/");
+        data_pedido_int = atoi(ano_pedido) * 10000 + atoi(mes_pedido) * 100 + atoi(dia_pedido);
+
+
+        if (data_pedido_int >= data_minima_int && data_pedido_int <= data_maxima_int) {
+            printf("\n------------------------ %dº Pedido Encontrado ------------------------", pedido_encontrado);
+            printf("\nID do Pedido: %d", pedido->id_pedido);
+            printf("\nID do Cliente: %d", pedido->id_cliente);
+            printf("\nID do Produto: %d", pedido->id_produto);
+            printf("\nID do Funcionario: %d", pedido->id_funcionario);
+            printf("\nPreco do Pedido: %f", pedido->preco);
+            printf("\nData do Pedido: %s", pedido->data);
+            getchar();
+            pedido_encontrado ++;
+        }
+    }
+    fclose(arquivo);
+    free(pedido);
 }

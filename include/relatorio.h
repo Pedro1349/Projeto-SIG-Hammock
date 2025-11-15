@@ -19,5 +19,9 @@ void listar_pedidos_ativos(void);
 void listar_pedidos_inativos(void);
 void listar_produtos_ativos(void);
 void listar_produtos_inativos(void);
+//==================================
+//  FILTRAGEM
+//==================================
 void filtrar_produtos_preco(void);
+void filtrar_pedidos_data(void);
 
