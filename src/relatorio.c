@@ -76,7 +76,10 @@ void navegacao_relatorios_produtos(void) {
                 break;
             case '2':   
                 listar_pedidos_inativos();
-                break;           
+                break;      
+            case '3':
+                filtrar_produtos_preco();
+                break;       
         }
     } while (opcao != '0');
 }
@@ -92,7 +95,7 @@ void navegacao_relatorios_pedidos(void) {
                 break;
             case '2':   
                 listar_pedidos_inativos();
-                break;           
+                break;       
         }
     } while (opcao != '0');
 }
@@ -170,6 +173,7 @@ char tela_relatorio_produtos(void){
     printf("║                                                 ║\n");
     printf("║ 1 - Listar produtos ativos                      ║\n");
     printf("║ 2 - Listar produtos inativos                    ║\n");
+    printf("║ 3 - Filtrar produtos por preço                  ║\n");
     printf("║                                                 ║\n");
     printf("╠═════════════════════════════════════════════════╣\n");
     printf("║ 0 - Voltar                                      ║\n");
@@ -513,4 +517,58 @@ void listar_pedidos_inativos(void) {
     free(pedido);
     printf("\nPressione ENTER para continuar...");
     getchar();
+}
+
+//filtrar produtos por preço
+
+void filtrar_produtos_preco(void) {
+    Produto* prod = (Produto*) malloc(sizeof(Produto));
+    char valor_minimo [20];
+    char valor_maximo [20];
+    float preco_minimo;
+    float preco_maximo;
+    int prod_encontrado = 1;
+
+    system("clear || cls");
+    printf("╔═════════════════════════════════════════════════╗\n");
+    printf("║          Filtrar Produtos por Preço             ║\n");
+    printf("╚═════════════════════════════════════════════════╝\n");
+
+    arquivo = fopen("database/produtos.dat", "rb");
+    if (arquivo == NULL) {
+        printf("\nNenhum produto encontrado (arquivo inexistente).\n");
+        getchar();
+        free(prod);
+        return;
+    }
+
+    do {
+        printf("Digite o preco mínimo do produto: ");
+        scanf("%[^\n]", valor_minimo);
+        limpar_buffer();
+
+    } while (validar_valor(valor_minimo) == 0);
+    preco_minimo = atof(valor_minimo);
+
+    do {
+        printf("\nAgora, digite o preco máximo do produto: ");
+        scanf("%[^\n]", valor_maximo);
+        limpar_buffer();
+
+    } while (validar_valor(valor_maximo) == 0);
+    preco_maximo = atof(valor_maximo);
+
+    system("clear || cls");
+    while (fread(prod, sizeof(Produto), 1, arquivo)) {
+        if (prod->valor_rede >= preco_minimo && prod->valor_rede <= preco_maximo) {
+            printf("\n------------------------ %dº Produto Encontrado ------------------------", prod_encontrado);
+            printf("\nID do Produto: %d", prod->id);
+            printf("\nModelo do Produto: %s", prod->modelo_rede);
+            printf("\nValor do Produto: %f", prod->valor_rede);
+            printf("\nTipo do Produto: %s", prod->tipo_rede);
+            printf("\nCor do Produto: %s", prod->cor_rede);
+            getchar();
+            prod_encontrado ++;
+        }
+    }
 }
