@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "../include/relatorio.h"
 #include "../include/utilidades.h"
 #include "../include/clientes.h"
@@ -43,7 +44,11 @@ void navegacao_relatorios_clientes(void) {
                 break;
             case '2':   
                 listar_clientes_inativos();
-                break;           
+                break;
+            case '3':
+                filtrar_clientes_nome();
+                break;
+           
         }
     } while (opcao != '0');
 }
@@ -60,6 +65,9 @@ void navegacao_relatorios_funcionarios(void) {
                 break;
             case '2':   
                 listar_funcionarios_inativos();
+                break;
+            case '3':
+                filtrar_funcionarios_nome();
                 break;           
         }
     } while (opcao != '0');
@@ -135,6 +143,7 @@ char tela_relatorio_clientes(void){
     printf("║                                                 ║\n");
     printf("║ 1 - Listar clientes ativos                      ║\n");
     printf("║ 2 - Listar clientes inativos                    ║\n");
+    printf("║ 3 - Filtrar clientes por nome                   ║\n");
     printf("║                                                 ║\n");
     printf("╠═════════════════════════════════════════════════╣\n");
     printf("║ 0 - Voltar                                      ║\n");
@@ -156,6 +165,7 @@ char tela_relatorio_funcionarios(void){
     printf("║                                                 ║\n");
     printf("║ 1 - Listar funcionários ativos                  ║\n");
     printf("║ 2 - Listar funcionários inativos                ║\n");
+    printf("║ 3 - Listar funcionarios por nome                ║\n");
     printf("║                                                 ║\n");
     printf("╠═════════════════════════════════════════════════╣\n");
     printf("║ 0 - Voltar                                      ║\n");
@@ -292,6 +302,68 @@ void listar_clientes_inativos(void) {
 }
 
 // ============================================================
+// FILTRAR CLIENTES POR NOME
+// ============================================================
+void filtrar_clientes_nome(void) {
+    Cliente* cli = (Cliente*) malloc(sizeof(Cliente));
+    char nome_busca[51];
+    char nome_cliente_lower[51];
+    char nome_busca_lower[51];
+    int cliente_encontrado = 1;
+
+    system("clear || cls");
+    printf("╔═════════════════════════════════════════════════╗\n");
+    printf("║            Filtrar Clientes por Nome            ║\n");
+    printf("╚═════════════════════════════════════════════════╝\n");
+
+    arquivo = fopen("database/clientes.dat", "rb");
+    if (arquivo == NULL) {
+        printf("\nNenhum cliente encontrado (arquivo inexistente).\n");
+        getchar();
+        free(cli);
+        return;
+    }
+
+    printf("Digite parte do nome do cliente: ");
+    scanf("%50[^\n]", nome_busca);
+    limpar_buffer();
+
+    // converter busca para minúsculas
+    for (int i = 0; nome_busca[i]; i++)
+        nome_busca_lower[i] = tolower(nome_busca[i]);
+    nome_busca_lower[strlen(nome_busca)] = '\0';
+
+    system("clear || cls");
+
+    while (fread(cli, sizeof(Cliente), 1, arquivo)) {
+        // Ignorar clientes inativos
+        if (cli->status == False)
+            continue;
+
+        // converter nome para minúsculas
+        for (int i = 0; cli->nome[i]; i++)
+            nome_cliente_lower[i] = tolower(cli->nome[i]);
+        nome_cliente_lower[strlen(cli->nome)] = '\0';
+
+        // procurar substring
+        if (strstr(nome_cliente_lower, nome_busca_lower)) {
+            printf("\n------------------------ %dº Cliente Encontrado ------------------------", cliente_encontrado);
+            printf("\nID: %d", cli->id);
+            printf("\nNome: %s", cli->nome);
+            printf("\nCPF: %s", cli->cpf);
+            printf("\nEmail: %s", cli->email);
+            printf("\nTelefone: %s", cli->telefone);
+            getchar();
+            cliente_encontrado++;
+        }
+    }
+
+    fclose(arquivo);
+    free(cli);
+}
+
+
+// ============================================================
 // LISTAR FUNCIONÁRIOS ATIVOS
 // ============================================================
 void listar_funcionarios_ativos(void) {
@@ -373,6 +445,66 @@ void listar_funcionarios_inativos(void) {
     printf("\n\nPressione ENTER para continuar...");
     getchar();
 }
+
+// ============================================================
+// FILTRAR FUNCIONÁRIOS POR NOME
+// ============================================================
+void filtrar_funcionarios_nome(void) {
+    Funcionarios* func = (Funcionarios*) malloc(sizeof(Funcionarios));
+    char nome_busca[51];
+    char nome_func_lower[51];
+    char nome_busca_lower[51];
+    int funcionario_encontrado = 1;
+
+    system("clear || cls");
+    printf("╔═════════════════════════════════════════════════╗\n");
+    printf("║         Filtrar Funcionários por Nome           ║\n");
+    printf("╚═════════════════════════════════════════════════╝\n");
+
+    arquivo = fopen("database/funcionarios.dat", "rb");
+    if (arquivo == NULL) {
+        printf("\nNenhum funcionário encontrado (arquivo inexistente).\n");
+        getchar();
+        free(func);
+        return;
+    }
+
+    printf("Digite parte do nome do funcionário: ");
+    scanf("%50[^\n]", nome_busca);
+    limpar_buffer();
+
+    // converter busca para minúsculas
+    for (int i = 0; nome_busca[i]; i++)
+        nome_busca_lower[i] = tolower(nome_busca[i]);
+    nome_busca_lower[strlen(nome_busca)] = '\0';
+
+    system("clear || cls");
+
+    while (fread(func, sizeof(Funcionarios), 1, arquivo)) {
+
+        if (func->status == False)
+            continue;
+
+        for (int i = 0; func->nome[i]; i++)
+            nome_func_lower[i] = tolower(func->nome[i]);
+        nome_func_lower[strlen(func->nome)] = '\0';
+
+        if (strstr(nome_func_lower, nome_busca_lower)) {
+            printf("\n-------------------- %dº Funcionário Encontrado --------------------", funcionario_encontrado);
+            printf("\nID: %d", func->id);
+            printf("\nNome: %s", func->nome);
+            printf("\nCPF: %s", func->cpf);
+            printf("\nEmail: %s", func->email);
+            printf("\nTelefone: %s", func->telefone);
+            getchar();
+            funcionario_encontrado++;
+        }
+    }
+
+    fclose(arquivo);
+    free(func);
+}
+
 
 // LISTAR PRODUTOS ATIVOS
 void listar_produtos_ativos(void) {
