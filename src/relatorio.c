@@ -246,10 +246,12 @@ void listar_clientes_ativos(void) {
     while (fread(cli, sizeof(Cliente), 1, arquivo)) {
         if (cli->status == True) {
             printf("| %-5d | %-20.20s | %-14.14s | %-25.25s | %-12.12s |\n", cli->id, cli->nome, cli->cpf, cli->email, cli->telefone);
+            encontrados++;
         }
     }
 
     if (encontrados == 0) {
+        system("clear || cls");
         printf("\nNenhum cliente ativo encontrado.\n");
     }
 
@@ -291,6 +293,7 @@ void listar_clientes_inativos(void) {
     }
 
     if (encontrados == 0) {
+        system("clear || cls");
         printf("\nNenhum cliente inativo encontrado.\n");
     }
 
@@ -335,6 +338,7 @@ void filtrar_clientes_nome(void) {
 
     system("clear || cls");
 
+    printf("| %-5s | %-20s | %-14s | %-25s | %-12s |\n", "ID", "NOME", "CPF", "EMAIL", "TELEFONE");
     while (fread(cli, sizeof(Cliente), 1, arquivo)) {
         // Ignorar clientes inativos
         if (cli->status == False)
@@ -347,17 +351,16 @@ void filtrar_clientes_nome(void) {
 
         // procurar substring
         if (strstr(nome_cliente_lower, nome_busca_lower)) {
-            printf("\n------------------------ %dº Cliente Encontrado ------------------------", cliente_encontrado);
-            printf("\nID: %d", cli->id);
-            printf("\nNome: %s", cli->nome);
-            printf("\nCPF: %s", cli->cpf);
-            printf("\nEmail: %s", cli->email);
-            printf("\nTelefone: %s", cli->telefone);
-            getchar();
+            printf("| %-5d | %-20.20s | %-14.14s | %-25.25s | %-12.12s |\n", cli->id, cli->nome, cli->cpf, cli->email, cli->telefone);
             cliente_encontrado++;
         }
     }
+    if (cliente_encontrado <= 1) {
+        system("clear || cls");
+        printf("Nenhum cliente com essa parte do nome foi encontrado.");
+    }
 
+    getchar();
     fclose(arquivo);
     free(cli);
 }
@@ -394,6 +397,7 @@ void listar_funcionarios_ativos(void) {
     }
 
     if (encontrados == 0) {
+        system("clear || cls");
         printf("\nNenhum funcionário ativo encontrado.\n");
     }
 
@@ -436,6 +440,7 @@ void listar_funcionarios_inativos(void) {
     }
 
     if (encontrados == 0) {
+        system("clear || cls");
         printf("\nNenhum funcionário inativo encontrado.\n");
     }
 
@@ -480,6 +485,7 @@ void filtrar_funcionarios_nome(void) {
 
     system("clear || cls");
 
+    printf("| %-5s | %-20s | %-14s | %-25s | %-12s |\n", "ID", "NOME", "CPF", "EMAIL", "TELEFONE");
     while (fread(func, sizeof(Funcionarios), 1, arquivo)) {
 
         if (func->status == False)
@@ -490,16 +496,16 @@ void filtrar_funcionarios_nome(void) {
         nome_func_lower[strlen(func->nome)] = '\0';
 
         if (strstr(nome_func_lower, nome_busca_lower)) {
-            printf("\n-------------------- %dº Funcionário Encontrado --------------------", funcionario_encontrado);
-            printf("\nID: %d", func->id);
-            printf("\nNome: %s", func->nome);
-            printf("\nCPF: %s", func->cpf);
-            printf("\nEmail: %s", func->email);
-            printf("\nTelefone: %s", func->telefone);
-            getchar();
+            printf("| %-5d | %-20.20s | %-14.14s | %-25.25s | %-12.12s |\n", func->id, func->nome, func->cpf, func->email, func->telefone);
             funcionario_encontrado++;
         }
     }
+    if (funcionario_encontrado <= 1) {
+        system("clear || cls");
+        printf("Nenhum funcionário com essa parte do nome foi encontrado.");
+    }
+
+    getchar();
 
     fclose(arquivo);
     free(func);
@@ -533,8 +539,10 @@ void listar_produtos_ativos(void) {
         }
     }
 
-    if (encontrados == 0)
+    if (encontrados == 0) {
+        system("clear || cls");
         printf("\nNenhum produto ativo encontrado.\n");
+    }
 
     fclose(arquivo);
     free(prod);
@@ -569,89 +577,13 @@ void listar_produtos_inativos(void) {
         }
     }
 
-    if (encontrados == 0)
+    if (encontrados == 0) {
+        system("clear || cls");
         printf("\nNenhum produto inativo encontrado.\n");
+    }
 
     fclose(arquivo);
     free(prod);
-    printf("\nPressione ENTER para continuar...");
-    getchar();
-}
-
-
-// ============================================================
-// LISTAR PEDIDOS ATIVOS
-// ============================================================
-void listar_pedidos_ativos(void) {
-    Pedido* pedido;
-    pedido = (Pedido*) malloc(sizeof(Pedido));
-    int encontrados = 0;
-
-    system("clear || cls");
-    printf("╔═════════════════════════════════════════════════╗\n");
-    printf("║                 Pedidos Ativos                  ║\n");
-    printf("╚═════════════════════════════════════════════════╝\n");
-
-    arquivo = fopen("database/pedidos.dat", "rb");
-    if (arquivo == NULL) {
-        printf("\nNenhum pedido encontrado (arquivo inexistente).\n");
-        getchar();
-        free(pedido);
-        return;
-    }
-
-    printf("| %-10s | %-10s | %-10s | %-15s | %-10s | %-26s |\n", "ID PEDIDO", "ID CLIENTE", "ID PRODUTO", "ID FUNCIONARIO", "PRECO", "DATA");
-
-    while (fread(pedido, sizeof(Pedido), 1, arquivo)) {
-        if (pedido->status == True) {
-            printf("| %-10d | %-10d | %-10d | %-15d | %-10.2f | %-26.26s |\n", pedido->id_pedido, pedido->id_cliente, pedido->id_produto, pedido->id_funcionario, pedido->preco, pedido->data);
-            encontrados++;
-        }
-    }
-
-    if (encontrados == 0)
-        printf("\nNenhum pedido ativo encontrado.\n");
-
-    fclose(arquivo);
-    free(pedido);
-    printf("\nPressione ENTER para continuar...");
-    getchar();
-}
-
-// ============================================================
-// LISTAR PEDIDOS INATIVOS
-// ============================================================
-void listar_pedidos_inativos(void) {
-    Pedido* pedido;
-    pedido = (Pedido*) malloc(sizeof(Pedido));
-    int encontrados = 0;
-
-    system("clear || cls");
-    printf("╔═════════════════════════════════════════════════╗\n");
-    printf("║                 Pedidos Inativos                ║\n");
-    printf("╚═════════════════════════════════════════════════╝\n");
-
-    arquivo = fopen("database/pedidos.dat", "rb");
-    if (arquivo == NULL) {
-        printf("\nNenhum pedido encontrado (arquivo inexistente).\n");
-        getchar();
-        free(pedido);
-        return;
-    }
-
-    printf("| %-10s | %-10s | %-10s | %-15s | %-10s | %-26s |\n", "ID PEDIDO", "ID CLIENTE", "ID PRODUTO", "ID FUNCIONARIO", "PRECO", "DATA");
-    while (fread(pedido, sizeof(Pedido), 1, arquivo)) {
-        if (pedido->status == False) {
-            printf("| %-10d | %-10d | %-10d | %-15d | %-10.2f | %-26.26s |\n", pedido->id_pedido, pedido->id_cliente, pedido->id_produto, pedido->id_funcionario, pedido->preco, pedido->data);
-            encontrados++;
-        }
-    }
-
-    if (encontrados == 0)
-        printf("\nNenhum pedido inativo encontrado.\n");
-
-    fclose(arquivo);
-    free(pedido);
     printf("\nPressione ENTER para continuar...");
     getchar();
 }
@@ -696,20 +628,104 @@ void filtrar_produtos_preco(void) {
     preco_maximo = atof(valor_maximo);
 
     system("clear || cls");
+
+    printf("| %-5s | %-20s | %-10s | %-20s | %-15s |\n", "ID", "MODELO", "VALOR", "TIPO", "COR");
     while (fread(prod, sizeof(Produto), 1, arquivo)) {
         if (prod->valor_rede >= preco_minimo && prod->valor_rede <= preco_maximo) {
-            printf("\n------------------------ %dº Produto Encontrado ------------------------", prod_encontrado);
-            printf("\nID do Produto: %d", prod->id);
-            printf("\nModelo do Produto: %s", prod->modelo_rede);
-            printf("\nValor do Produto: %f", prod->valor_rede);
-            printf("\nTipo do Produto: %s", prod->tipo_rede);
-            printf("\nCor do Produto: %s", prod->cor_rede);
-            getchar();
+            printf("| %-5d | %-20.20s | %-10.2f | %-20.20s | %-15.15s |\n", prod->id, prod->modelo_rede, prod->valor_rede, prod->tipo_rede, prod->cor_rede);
             prod_encontrado ++;
         }
     }
+    if (prod_encontrado <= 1) {
+        system("clear || cls");
+        printf("Nenhum produto foi encontrado nessa faixa de preço.");
+    }
+
+    getchar();
+
     fclose(arquivo);
     free(prod);
+}
+
+// ============================================================
+// LISTAR PEDIDOS ATIVOS
+// ============================================================
+void listar_pedidos_ativos(void) {
+    Pedido* pedido;
+    pedido = (Pedido*) malloc(sizeof(Pedido));
+    int encontrados = 0;
+
+    system("clear || cls");
+    printf("╔═════════════════════════════════════════════════╗\n");
+    printf("║                 Pedidos Ativos                  ║\n");
+    printf("╚═════════════════════════════════════════════════╝\n");
+
+    arquivo = fopen("database/pedidos.dat", "rb");
+    if (arquivo == NULL) {
+        printf("\nNenhum pedido encontrado (arquivo inexistente).\n");
+        getchar();
+        free(pedido);
+        return;
+    }
+
+    printf("| %-10s | %-10s | %-10s | %-15s | %-10s | %-26s |\n", "ID PEDIDO", "ID CLIENTE", "ID PRODUTO", "ID FUNCIONARIO", "PRECO", "DATA");
+
+    while (fread(pedido, sizeof(Pedido), 1, arquivo)) {
+        if (pedido->status == True) {
+            printf("| %-10d | %-10d | %-10d | %-15d | %-10.2f | %-26.26s |\n", pedido->id_pedido, pedido->id_cliente, pedido->id_produto, pedido->id_funcionario, pedido->preco, pedido->data);
+            encontrados++;
+        }
+    }
+
+    if (encontrados == 0) {
+        system("clear || cls");
+        printf("\nNenhum pedido ativo encontrado.\n");
+    }
+
+    fclose(arquivo);
+    free(pedido);
+    printf("\nPressione ENTER para continuar...");
+    getchar();
+}
+
+// ============================================================
+// LISTAR PEDIDOS INATIVOS
+// ============================================================
+void listar_pedidos_inativos(void) {
+    Pedido* pedido;
+    pedido = (Pedido*) malloc(sizeof(Pedido));
+    int encontrados = 0;
+
+    system("clear || cls");
+    printf("╔═════════════════════════════════════════════════╗\n");
+    printf("║                 Pedidos Inativos                ║\n");
+    printf("╚═════════════════════════════════════════════════╝\n");
+
+    arquivo = fopen("database/pedidos.dat", "rb");
+    if (arquivo == NULL) {
+        printf("\nNenhum pedido encontrado (arquivo inexistente).\n");
+        getchar();
+        free(pedido);
+        return;
+    }
+
+    printf("| %-10s | %-10s | %-10s | %-15s | %-10s | %-26s |\n", "ID PEDIDO", "ID CLIENTE", "ID PRODUTO", "ID FUNCIONARIO", "PRECO", "DATA");
+    while (fread(pedido, sizeof(Pedido), 1, arquivo)) {
+        if (pedido->status == False) {
+            printf("| %-10d | %-10d | %-10d | %-15d | %-10.2f | %-26.26s |\n", pedido->id_pedido, pedido->id_cliente, pedido->id_produto, pedido->id_funcionario, pedido->preco, pedido->data);
+            encontrados++;
+        }
+    }
+
+    if (encontrados == 0) {
+        system("clear || cls");
+        printf("\nNenhum pedido inativo encontrado.\n");
+    }
+
+    fclose(arquivo);
+    free(pedido);
+    printf("\nPressione ENTER para continuar...");
+    getchar();
 }
 
 //filtrar pedidos por data
@@ -777,6 +793,9 @@ void filtrar_pedidos_data(void) {
     data_maxima_int = atoi(ano_maximo) * 10000 + atoi(mes_maximo) * 100 + atoi(dia_maximo);
 
 
+    system("clear || cls");
+
+    printf("| %-10s | %-10s | %-10s | %-15s | %-10s | %-26s |\n", "ID PEDIDO", "ID CLIENTE", "ID PRODUTO", "ID FUNCIONARIO", "PRECO", "DATA");
     while (fread(pedido, sizeof(Pedido), 1, arquivo)) {
         strcpy(data_copia, pedido->data);
         dia_pedido = strtok(data_copia, "/");
@@ -786,17 +805,17 @@ void filtrar_pedidos_data(void) {
 
 
         if (data_pedido_int >= data_minima_int && data_pedido_int <= data_maxima_int) {
-            printf("\n------------------------ %dº Pedido Encontrado ------------------------", pedido_encontrado);
-            printf("\nID do Pedido: %d", pedido->id_pedido);
-            printf("\nID do Cliente: %d", pedido->id_cliente);
-            printf("\nID do Produto: %d", pedido->id_produto);
-            printf("\nID do Funcionario: %d", pedido->id_funcionario);
-            printf("\nPreco do Pedido: %f", pedido->preco);
-            printf("\nData do Pedido: %s", pedido->data);
-            getchar();
+            printf("| %-10d | %-10d | %-10d | %-15d | %-10.2f | %-26.26s |\n", pedido->id_pedido, pedido->id_cliente, pedido->id_produto, pedido->id_funcionario, pedido->preco, pedido->data);
             pedido_encontrado ++;
         }
     }
+    if (pedido_encontrado <= 1) {
+        system("clear || cls");
+        printf("Nennhum pedido foi encontrado nesse período.");
+    }
+
+    getchar();
+
     fclose(arquivo);
     free(pedido);
 }
