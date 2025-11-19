@@ -20,4 +20,5 @@ void perma_excluir_pedido(void);
 void modulo_pedidos(void);
 int verificar_criacao_pedidos(void);
 void receber_dados_pedido(Pedido*);
+void adicionar_outro_produto(Pedido*);
 void alterar_campo_pedido(Pedido*, char);

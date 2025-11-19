@@ -64,6 +64,7 @@ void cadastrar_pedidos(void){
         limpar_buffer();
         Pedido* pedido;
         pedido = (Pedido*) malloc(sizeof(Pedido));
+        char add_produto;
 
         system("clear || cls");
         printf("╔═════════════════════════════════════════════════╗\n");
@@ -79,6 +80,20 @@ void cadastrar_pedidos(void){
         else{
             //Escreve o novo pedido no arquivo
             fwrite(pedido, sizeof(Pedido), 1, arquivo_pedido);
+
+            do {
+                system("clear || cls");
+                printf("Deseja adicionar outro produto a esse pedido?\n1 - SIM\n2 - NÃO\n");
+                scanf("%c", &add_produto);
+                limpar_buffer();
+                if (add_produto == '1') {
+                    adicionar_outro_produto(pedido);
+                    fwrite(pedido, sizeof(Pedido), 1, arquivo_pedido);
+                    printf("Novo produto foi adicionado ao pedido.");
+                    getchar();
+                }
+            } while (add_produto != '2');
+
             fclose(arquivo_pedido);
             printf("\nPedido de numero %d cadastrado com sucesso!", pedido->id_pedido);
             printf("\nPressione ENTER para continuar.");
@@ -499,20 +514,20 @@ void receber_dados_pedido(Pedido* pedido) {
     pedido->id_cliente = atoi(id);
 
     do {
-        printf("Digite o ID do produto que fez o pedido: ");
-        scanf("%[^\n]", id);
-        limpar_buffer();
-    }
-    while (verificar_id_produto(id) == 0);
-    pedido->id_produto = atoi(id);
-
-    do {
         printf("Digite o ID do funcionario que fez o pedido: ");
         scanf("%[^\n]", id);
         limpar_buffer();
     }
     while (verificar_id_funcionario(id) == 0);
-    pedido->id_funcionario = atoi(id); 
+    pedido->id_funcionario = atoi(id);
+
+    do {
+        printf("Digite o ID do produto que compõe o pedido: ");
+        scanf("%[^\n]", id);
+        limpar_buffer();
+    }
+    while (verificar_id_produto(id) == 0);
+    pedido->id_produto = atoi(id);
 
     pedido->preco = verificar_valor_produto(atoi(id));
 
@@ -531,9 +546,21 @@ void receber_dados_pedido(Pedido* pedido) {
     }
 
     pedido->id_pedido = gerar_id(arquivo_pedido, 4);
+    pedido->status = True;
 
     fclose(arquivo_pedido);
-    pedido->status = True;
+}
+
+void adicionar_outro_produto(Pedido *pedido) {
+    char id[20];
+    do {
+        printf("Digite o ID do outro produto que compõe o pedido: ");
+        scanf("%[^\n]", id);
+        limpar_buffer();
+    } while (verificar_id_produto(id) == 0);
+
+    pedido->id_produto = atoi(id);
+    pedido->preco = verificar_valor_produto(atoi(id));
 }
 
 void alterar_campo_pedido(Pedido *pedido, char opc_alterar) {
@@ -598,3 +625,6 @@ void alterar_campo_pedido(Pedido *pedido, char opc_alterar) {
     printf("\nData do pedido: %s", pedido->data);
     getchar();
 }
+
+//adicionar função que adiciona um produto a um pedido existente
+//
