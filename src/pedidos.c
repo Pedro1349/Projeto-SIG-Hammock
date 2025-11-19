@@ -22,13 +22,11 @@ void modulo_pedidos(void){
                         break;
             case '2':   exibir_pedidos();
                         break;
-            case '3':   alterar_pedido();
+            case '3':   excluir_pedido();
                         break;
-            case '4':   excluir_pedido();
+            case '4':   perma_excluir_pedido();
                         break;
-            case '5':   perma_excluir_pedido();
-                        break;
-            case '6':   restaurar_pedido();
+            case '5':   restaurar_pedido();
                         break;
 
         }
@@ -45,10 +43,9 @@ char tela_de_pedidos(void){
     printf("║                                                 ║\n");
     printf("║ 1 - Cadastrar Pedido                            ║\n");
     printf("║ 2 - Exibir Pedido                               ║\n");
-    printf("║ 3 - Editar Pedido                               ║\n");
-    printf("║ 4 - Excluir Pedido                              ║\n");
-    printf("║ 5 - Excluir permanentemente Pedido              ║\n");
-    printf("║ 6 - Restaurar Pedido                            ║\n");
+    printf("║ 3 - Excluir Pedido                              ║\n");
+    printf("║ 4 - Excluir permanentemente Pedido              ║\n");
+    printf("║ 5 - Restaurar Pedido                            ║\n");
     printf("║                                                 ║\n");
     printf("╠═════════════════════════════════════════════════╣\n");
     printf("║ 0 - Voltar                                      ║\n");
@@ -140,6 +137,7 @@ void exibir_pedidos(void){
 
             total_preco += pedido->preco;
             pedido_exibir = pedido;
+
             auxi++;
         }
     }
@@ -164,68 +162,6 @@ void exibir_pedidos(void){
     limpar_buffer();
     printf("\nNenhum pedido com o ID %d foi encontrado.", id_procurar);
     getchar();
-}
-
-void alterar_pedido(void){
-    int id_procurar = 0;
-    char opc_alterar;
-    char opc_confirmar;
-    int pedido_alterado = False;
-    Pedido* pedido;
-    pedido = (Pedido*) malloc(sizeof(Pedido));
-
-    system("clear || cls");
-    printf("╔═════════════════════════════════════════════════╗\n");
-    printf("║                Alterar Pedidos                  ║\n");
-    printf("╚═════════════════════════════════════════════════╝\n");
-    printf("Digite o ID do pedido que deseja alterar: ");
-    scanf(" %d", &id_procurar);
-    limpar_buffer();
-
-    arquivo_pedido = fopen("database/pedidos.dat", "r+b");
-
-    //testa se o arquivo existe, se não existe, cria o arquivo
-    if (arquivo_pedido == NULL) {
-        arquivo_pedido = fopen("pedidos.csv", "wb");
-        fclose(arquivo_pedido);
-        arquivo_pedido = fopen("pedidos.csv", "r+b");
-    }
-
-    while (fread(pedido, sizeof(Pedido), 1, arquivo_pedido) && pedido_alterado == False){
-        if (pedido->id_pedido == id_procurar && pedido->status == True){
-            do {
-                system("clear || cls");
-                printf("\nO que deseja alterar desse pedido? (Digite 1,2,3,4 OU 5)");
-                printf("\n1 - ID_cliente");
-                printf("\n2 - ID_produto");
-                printf("\n3 - ID_funcionario");
-                printf("\n4 - Preco");    
-                printf("\n5 - Data\n");
-                scanf("%c", &opc_alterar);
-                limpar_buffer();
-            } while(opc_alterar != '1' && opc_alterar != '2' && opc_alterar != '3' && opc_alterar != '4' && opc_alterar != '5');
-
-            alterar_campo_pedido(pedido, opc_alterar);
-
-            printf("\nDeseja alterar algum outro campo? (s/n)\n");
-            scanf("%c", &opc_confirmar);
-            limpar_buffer();
-            fseek(arquivo_pedido, (-1)*sizeof(Pedido), SEEK_CUR);
-            fwrite(pedido, sizeof(Pedido), 1, arquivo_pedido);
-
-            if (opc_confirmar == 's' || opc_confirmar == 'S'){
-                fseek(arquivo_pedido, (-1)*sizeof(Pedido), SEEK_CUR);     
-            } else {
-                pedido_alterado = True;
-            }
-        }   
-    }
-    if (pedido_alterado == False) {
-        printf("\nPedido com o ID %d não foi encontrado...", id_procurar);
-        getchar();
-    }
-    fclose(arquivo_pedido);
-    free(pedido);
 }
 
 void excluir_pedido(void){
@@ -367,6 +303,7 @@ void restaurar_pedido(void){
 void perma_excluir_pedido(void) {
     int id_procurar = 0;
     int excluido = False;
+    int pedido_encontrado = False;
     char opc_confirmar;
     char opc_escolha;
     Pedido* pedido;
@@ -399,34 +336,40 @@ void perma_excluir_pedido(void) {
 
         while (fread(pedido, sizeof(Pedido), 1, arquivo_pedido)){
             if (pedido->id_pedido == id_procurar && pedido->status == False){
-                system("clear || cls");
-                printf("\n\n------------------------ Pedido ------------------------");
-                printf("\nID do pedido: %d", pedido->id_pedido);
-                printf("\nID do cliente: %d", pedido->id_cliente);
-                printf("\nID do produto: %d", pedido->id_produto);
-                printf("\nID do funcionario: %d", pedido->id_funcionario);
-                printf("\nPreco do pedido: %f", pedido->preco);
-                printf("\nData do pedido: %s", pedido->data);
-                printf("\n\nPedido de ID %d foi encontrado.\nTem certeza que deseja exclui-lo permanentemente? (s/n)", id_procurar);
-                scanf("%c", &opc_confirmar);
-                limpar_buffer();
+                if (pedido_encontrado == False) {
+                    system("clear || cls");
+                    printf("\n\n------------------------ Pedido ------------------------");
+                    printf("\nID do pedido: %d", pedido->id_pedido);
+                    printf("\nID do cliente: %d", pedido->id_cliente);
+                    printf("\nID do produto: %d", pedido->id_produto);
+                    printf("\nID do funcionario: %d", pedido->id_funcionario);
+                    printf("\nPreco do pedido: %f", pedido->preco);
+                    printf("\nData do pedido: %s", pedido->data);
+                    printf("\n\nPedido de ID %d foi encontrado.\nTem certeza que deseja exclui-lo permanentemente? (s/n)", id_procurar);
+                    scanf("%c", &opc_confirmar);
+                    limpar_buffer();
 
-                if (opc_confirmar == 's' || opc_confirmar == 'S') {
-                    printf("\nPedido com o ID %d excluido com sucesso!", id_procurar);
-                    getchar();
-                    excluido = True;
-                } else {
-                    fwrite(pedido, sizeof(Pedido), 1, arquivo_novo);
-                    printf("\nExclusão cancelada.");
-                    getchar();
-                    excluido = True;
+                    if (opc_confirmar == 's' || opc_confirmar == 'S') {
+                        printf("\nPedido com o ID %d excluido com sucesso!", id_procurar);
+                        getchar();
+                        excluido = True;
+                        pedido_encontrado = True;
+                    } else {
+                        fwrite(pedido, sizeof(Pedido), 1, arquivo_novo);
+                        printf("\nExclusão cancelada.");
+                        getchar();
+                        pedido_encontrado = True;
+                        excluido = True;
+                    }
+                } else if (excluido == True) { // Serve para excluir as outras instâncias de pedido sem perguntar novamente ao cliente
+
                 }
             } else {
                 fwrite(pedido, sizeof(Pedido), 1, arquivo_novo);
             }
                     
         }
-        if (excluido == False) {
+        if (pedido_encontrado == False) {
             printf("\nNão existe nenhum pedido inativo com o ID %d...", id_procurar);
             getchar();
         }
