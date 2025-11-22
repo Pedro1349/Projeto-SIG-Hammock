@@ -107,6 +107,9 @@ void navegacao_relatorios_pedidos(void) {
                 break;  
             case '3':
                 filtrar_pedidos_data();
+                break;
+            case '4':
+                filtrar_produtos_de_pedido();
                 break;     
         }
     } while (opcao != '0');
@@ -210,6 +213,7 @@ char tela_relatorio_pedidos(void){
     printf("║ 1 - Listar pedidos ativos                       ║\n");
     printf("║ 2 - Listar pedidos inativos                     ║\n");
     printf("║ 3 - Filtrar pedidos por período                 ║\n");
+    printf("║ 4 - Listar produtos de um pedido                ║\n");
     printf("║                                                 ║\n");
     printf("╠═════════════════════════════════════════════════╣\n");
     printf("║ 0 - Voltar                                      ║\n");
@@ -818,4 +822,102 @@ void filtrar_pedidos_data(void) {
 
     fclose(arquivo);
     free(pedido);
+}
+
+void filtrar_produtos_de_pedido(void) {
+    int id_procurar = 0;
+    Pedido* pedido;
+    pedido = (Pedido*) malloc(sizeof(Pedido));
+
+    Pedido* pedido_exibir;
+    pedido_exibir = (Pedido*) malloc(sizeof(Pedido));
+
+    Produto* prod;
+    prod = (Produto*) malloc(sizeof(Produto));
+
+    char id_produtos[50] = "";
+    int id_produtos_integer[50];
+    float total_preco = 0;
+
+    system("clear || cls");
+    printf("╔═════════════════════════════════════════════════╗\n");
+    printf("║              Produtos de um pedido              ║\n");
+    printf("╚═════════════════════════════════════════════════╝\n");
+
+    printf("Digite o ID do pedido que deseja ver os produtos que o compõe: ");
+    scanf(" %d", &id_procurar);
+
+    arquivo = fopen("database/pedidos.dat", "rb");
+    if (arquivo == NULL) {
+        printf("\nNenhum pedido encontrado (arquivo inexistente).\n");
+        getchar();
+        free(pedido);
+        free(prod);
+        free(pedido_exibir);
+        return;
+    }
+
+    // Obtendo as informações do pedido
+    int auxi = 0;
+    char temp[20];
+    while (fread(pedido, sizeof(Pedido), 1, arquivo)){
+        if (pedido->id_pedido == id_procurar && pedido->status == True){
+            sprintf(temp, "%d,", pedido->id_produto);
+            strcat(id_produtos, temp);
+            id_produtos_integer[auxi] = pedido->id_produto;
+
+            total_preco += pedido->preco;
+            *pedido_exibir = *pedido;
+
+            auxi++;
+        }
+    }
+    fclose(arquivo);
+
+    arquivo = fopen("database/produtos.dat", "rb");
+    if (arquivo == NULL) {
+        printf("\nNenhum produto encontrado (arquivo inexistente).\n");
+        getchar();
+        free(pedido);
+        free(prod);
+        free(pedido_exibir);
+        return;
+    }
+
+    // Exibindo o pedido
+    if (total_preco != 0) {
+        system("clear || cls");
+        printf("\n\t\t\tPEDIDO DIGITADO:");
+        printf("\nID do Pedido: %d", pedido_exibir->id_pedido);
+        printf("\t\t\tID do Cliente: %d", pedido_exibir->id_cliente);
+        printf("\nID dos Produtos: %s", id_produtos);
+        printf("\t\tID do Funcionario: %d", pedido_exibir->id_funcionario);
+        printf("\nPreco do Pedido: %f", total_preco);
+        printf("\tData do Pedido: %s\n", pedido_exibir->data);
+
+        printf("\n\t\tPRODUTOS QUE COMPÕEM O PEDIDO:\n");
+        printf("| %-5s | %-20s | %-10s | %-20s | %-15s |\n", "ID", "MODELO", "VALOR", "TIPO", "COR");
+        while(fread(prod, sizeof(Produto), 1, arquivo)) {
+            for (int x = 0; x < auxi; x++) {
+                if (prod->id == id_produtos_integer[x]) {
+                    printf("| %-5d | %-20.20s | %-10.2f | %-20.20s | %-15.15s |\n", prod->id, prod->modelo_rede, prod->valor_rede, prod->tipo_rede, prod->cor_rede);
+                }
+            }
+        }
+
+        limpar_buffer();
+        getchar();
+        fclose(arquivo);
+        free(pedido);
+        free(prod);
+        free(pedido_exibir);
+        return;
+    }
+    free(pedido);
+    free(prod);
+    free(pedido_exibir);
+    fclose(arquivo);
+    limpar_buffer();
+    printf("\nNenhum pedido com o ID %d foi encontrado.", id_procurar);
+    getchar();
 }

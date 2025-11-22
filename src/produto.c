@@ -571,3 +571,20 @@ void alterar_campo_produto(Produto *prod, char opc_alterar) {
     printf("\nCor do Produto: %s", prod->cor_rede);
     getchar();
 }
+
+Produto* pesquisar_produto_ID(int id) {
+    Produto* prod;
+    prod = (Produto*) malloc(sizeof(Produto));
+    arquivo_produto = fopen("database/produtos.dat", "rb");
+
+    while(fread(prod, sizeof(Produto), 1, arquivo_produto)) {
+        if (id == prod->id) {
+            fclose(arquivo_produto);
+            return prod;
+        }
+    }
+    fclose(arquivo_produto);
+
+    prod->id = -1;
+    return prod;
+}
