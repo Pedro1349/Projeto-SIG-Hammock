@@ -20,3 +20,4 @@ void modulo_clientes(void);
 int verificar_id_cliente(char*);
 void receber_dados_cliente(Cliente*);
 void alterar_campo_cliente(Cliente*, char);
+char* procurar_nome_cliente(int);

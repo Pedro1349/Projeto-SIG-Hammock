@@ -545,3 +545,17 @@ void alterar_campo_cliente(Cliente* cli, char opc_alterar) {
     printf("\nTelefone do cliente: %s", cli->telefone);
     getchar();
 }
+
+char* procurar_nome_cliente(int id) {
+    Cliente* cli;
+    cli = (Cliente*) malloc(sizeof(Cliente));
+
+    arquivo_cliente = fopen("database/clientes.dat", "rb");
+
+    while(fread(cli, sizeof(Cliente), 1, arquivo_cliente)) {
+        if (cli->id == id)  {
+            return cli->nome;
+        }
+    }
+    return NULL;
+}

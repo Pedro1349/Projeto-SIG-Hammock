@@ -22,3 +22,4 @@ void modulo_funcionarios(void);
 int verificar_id_funcionario(char*);
 void receber_dados_funcionario(Funcionarios*);
 void alterar_campo_funcionario(Funcionarios*, char);
+char* procurar_nome_funcionario(int id);

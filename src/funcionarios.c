@@ -541,3 +541,17 @@ void alterar_campo_funcionario(Funcionarios *func, char opc_alterar) {
     printf("\nTelefone do Funcionário: %s", func->telefone);
     getchar();
 }
+
+char* procurar_nome_funcionario(int id) {
+    Funcionarios* func;
+    func = (Funcionarios*) malloc(sizeof(Funcionarios));
+
+    arquivo_funcionario = fopen("database/funcionarios.dat", "rb");
+
+    while(fread(func, sizeof(Funcionarios), 1, arquivo_funcionario)) {
+        if (func->id == id)  {
+            return func->nome;
+        }
+    }
+    return NULL;
+}

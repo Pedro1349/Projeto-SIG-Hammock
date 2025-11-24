@@ -25,3 +25,4 @@ float verificar_valor_produto(int);
 void receber_dados_produto(Produto*);
 void alterar_campo_produto(Produto*, char);
 Produto* pesquisar_produto_ID(int);
+char* procurar_nome_produto(int);

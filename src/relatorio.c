@@ -658,6 +658,9 @@ void listar_pedidos_ativos(void) {
     Pedido* pedido;
     pedido = (Pedido*) malloc(sizeof(Pedido));
     int encontrados = 0;
+    char nome_cliente[51] = "";
+    char nome_produto[51] =  "";
+    char nome_funcionario[51] = "";
 
     system("clear || cls");
     printf("╔═════════════════════════════════════════════════╗\n");
@@ -672,11 +675,14 @@ void listar_pedidos_ativos(void) {
         return;
     }
 
-    printf("| %-10s | %-10s | %-10s | %-15s | %-10s | %-26s |\n", "ID PEDIDO", "ID CLIENTE", "ID PRODUTO", "ID FUNCIONARIO", "PRECO", "DATA");
-
+    printf("| %-10s | %-21s | %-21s | %-21s | %-10s | %-26s |\n", "ID PEDIDO", "NOME CLIENTE", "NOME PRODUTO", "NOME FUNCIONARIO", "PRECO", "DATA");
     while (fread(pedido, sizeof(Pedido), 1, arquivo)) {
         if (pedido->status == True) {
-            printf("| %-10d | %-10d | %-10d | %-15d | %-10.2f | %-26.26s |\n", pedido->id_pedido, pedido->id_cliente, pedido->id_produto, pedido->id_funcionario, pedido->preco, pedido->data);
+            strcpy(nome_cliente, procurar_nome_cliente(pedido->id_cliente));
+            strcpy(nome_produto, procurar_nome_produto(pedido->id_produto));
+            strcpy(nome_funcionario, procurar_nome_funcionario(pedido->id_funcionario));
+
+            printf("| %-10d | %-21s | %-21s | %-21s | %-10.2f | %-26.26s |\n", pedido->id_pedido, nome_cliente, nome_produto, nome_funcionario, pedido->preco, pedido->data);
             encontrados++;
         }
     }
@@ -699,6 +705,9 @@ void listar_pedidos_inativos(void) {
     Pedido* pedido;
     pedido = (Pedido*) malloc(sizeof(Pedido));
     int encontrados = 0;
+    char nome_cliente[51] = "";
+    char nome_produto[51] = "";
+    char nome_funcionario[51] = "";
 
     system("clear || cls");
     printf("╔═════════════════════════════════════════════════╗\n");
@@ -713,10 +722,14 @@ void listar_pedidos_inativos(void) {
         return;
     }
 
-    printf("| %-10s | %-10s | %-10s | %-15s | %-10s | %-26s |\n", "ID PEDIDO", "ID CLIENTE", "ID PRODUTO", "ID FUNCIONARIO", "PRECO", "DATA");
+    printf("| %-10s | %-21s | %-21s | %-21s | %-10s | %-26s |\n", "ID PEDIDO", "NOME CLIENTE", "NOME PRODUTO", "NOME FUNCIONARIO", "PRECO", "DATA");
     while (fread(pedido, sizeof(Pedido), 1, arquivo)) {
         if (pedido->status == False) {
-            printf("| %-10d | %-10d | %-10d | %-15d | %-10.2f | %-26.26s |\n", pedido->id_pedido, pedido->id_cliente, pedido->id_produto, pedido->id_funcionario, pedido->preco, pedido->data);
+            strcpy(nome_cliente, procurar_nome_cliente(pedido->id_cliente));
+            strcpy(nome_produto, procurar_nome_produto(pedido->id_produto));
+            strcpy(nome_funcionario, procurar_nome_funcionario(pedido->id_funcionario));
+
+            printf("| %-10d | %-21s | %-21s | %-21s | %-10.2f | %-26.26s |\n", pedido->id_pedido, nome_cliente, nome_produto, nome_funcionario, pedido->preco, pedido->data);
             encontrados++;
         }
     }
