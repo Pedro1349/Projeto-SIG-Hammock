@@ -518,13 +518,18 @@ void filtrar_funcionarios_nome(void) {
 
 // LISTAR PRODUTOS ATIVOS
 void listar_produtos_ativos(void) {
-    Produto* prod = (Produto*) malloc(sizeof(Produto));
-    int encontrados = 0;
+    Produto* prod;
+    prod = (Produto*) malloc(sizeof(Produto));
+
+    Produto* prod_lista;
+
+    Produto* prod_ult;
 
     system("clear || cls");
     printf("╔═════════════════════════════════════════════════╗\n");
-    printf("║                Produtos Ativos                  ║\n");
+    printf("║                 Produtos Ativos                 ║\n");
     printf("╚═════════════════════════════════════════════════╝\n");
+
 
     arquivo = fopen("database/produtos.dat", "rb");
     if (arquivo == NULL) {
@@ -534,21 +539,51 @@ void listar_produtos_ativos(void) {
         return;
     }
 
-    printf("| %-5s | %-20s | %-10s | %-20s | %-15s |\n", "ID", "MODELO", "VALOR", "TIPO", "COR");
-
+    int auxi = 0;
     while (fread(prod, sizeof(Produto), 1, arquivo)) {
         if (prod->status == True) {
-            printf("| %-5d | %-20.20s | %-10.2f | %-20.20s | %-15.15s |\n", prod->id, prod->modelo_rede, prod->valor_rede, prod->tipo_rede, prod->cor_rede);
-            encontrados++;
+            Produto* prod_novo;
+            prod_novo = (Produto*) malloc(sizeof(Produto));
+
+            *prod_novo = *prod;
+            prod_novo->prox = NULL;
+
+            if (auxi == 0) {
+                prod_ult = prod_novo;
+                prod_lista = prod_novo;
+            } else {
+                prod_ult->prox = prod_novo;
+                prod_ult = prod_novo;
+            }
+            auxi++;
         }
     }
 
-    if (encontrados == 0) {
+    Produto* prod_novo = prod_lista;
+
+    printf("| %-5s | %-20s | %-10s | %-25s | %-15s |\n", "ID", "MODELO", "VALOR", "TIPO", "COR");
+    int x = 0;
+    while(x < auxi) {
+
+        printf("| %-5d | %-20.20s | %-10.2f | %-25.20s | %-15.15s |\n", prod_novo->id, prod_novo->modelo_rede, prod_novo->valor_rede, prod_novo->tipo_rede, prod_novo->cor_rede);
+        if (prod_novo->prox != NULL) {
+            prod_novo = prod_novo->prox;
+        }
+        x ++;
+    }
+
+    Produto* atual = prod_lista;
+    while (atual != NULL) { // Limpando a lista
+        Produto* prox = atual->prox;
+        free(atual);
+        atual = prox;
+    }
+
+    if (auxi == 0) {
         system("clear || cls");
         printf("\nNenhum produto ativo encontrado.\n");
     }
 
-    fclose(arquivo);
     free(prod);
     printf("\nPressione ENTER para continuar...");
     getchar();

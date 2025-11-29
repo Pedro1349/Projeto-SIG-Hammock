@@ -7,6 +7,7 @@ struct produto{
     char tipo_rede[51]; 
     char cor_rede [51];
     int status;
+    Produto* prox;
 };
 
 

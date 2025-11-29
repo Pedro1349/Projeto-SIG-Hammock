@@ -515,6 +515,7 @@ void receber_dados_produto(Produto *prod) {
 
     fclose(arquivo_produto);
     prod->status = True;
+    prod->prox = NULL;
 }
 
 void alterar_campo_produto(Produto *prod, char opc_alterar) {
