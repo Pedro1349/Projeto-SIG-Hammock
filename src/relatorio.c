@@ -84,7 +84,7 @@ void navegacao_relatorios_produtos(void) {
                 listar_produtos_ativos();
                 break;
             case '2':   
-                listar_pedidos_inativos();
+                listar_produtos_inativos();
                 break;      
             case '3':
                 filtrar_produtos_preco();
@@ -516,7 +516,7 @@ void filtrar_funcionarios_nome(void) {
 }
 
 
-// LISTAR PRODUTOS ATIVOS
+// LISTAR PRODUTOS ATIVOS USANDO LISTA DINÂMICA DIRETA
 void listar_produtos_ativos(void) {
     Produto* prod;
     prod = (Produto*) malloc(sizeof(Produto));
@@ -558,46 +558,43 @@ void listar_produtos_ativos(void) {
             auxi++;
         }
     }
+    if (auxi > 0) {
+        Produto* prod_novo = prod_lista;
 
-    Produto* prod_novo = prod_lista;
-
-    printf("| %-5s | %-20s | %-10s | %-25s | %-15s |\n", "ID", "MODELO", "VALOR", "TIPO", "COR");
-    int x = 0;
-    while(x < auxi) {
-
-        printf("| %-5d | %-20.20s | %-10.2f | %-25.20s | %-15.15s |\n", prod_novo->id, prod_novo->modelo_rede, prod_novo->valor_rede, prod_novo->tipo_rede, prod_novo->cor_rede);
-        if (prod_novo->prox != NULL) {
+        printf("| %-5s | %-20s | %-10s | %-25s | %-15s |\n", "ID", "MODELO", "VALOR", "TIPO", "COR");
+        while(prod_novo != NULL) {
+            printf("| %-5d | %-20.20s | %-10.2f | %-25.20s | %-15.15s |\n", prod_novo->id, prod_novo->modelo_rede, prod_novo->valor_rede, prod_novo->tipo_rede, prod_novo->cor_rede);
             prod_novo = prod_novo->prox;
         }
-        x ++;
-    }
 
-    Produto* atual = prod_lista;
-    while (atual != NULL) { // Limpando a lista
-        Produto* prox = atual->prox;
-        free(atual);
-        atual = prox;
-    }
-
-    if (auxi == 0) {
-        system("clear || cls");
+        Produto* atual = prod_lista;
+        while (atual != NULL) { // Limpando a lista
+            Produto* prox = atual->prox;
+            free(atual);
+            atual = prox;
+        }
+    } else {
         printf("\nNenhum produto ativo encontrado.\n");
     }
 
+    fclose(arquivo);
     free(prod);
     printf("\nPressione ENTER para continuar...");
     getchar();
 }
 
-// LISTAR PRODUTOS INATIVOS
+// LISTAR PRODUTOS INATIVOS USANDO LISTA DINÂMICA REVERSA
 void listar_produtos_inativos(void) {
-    Produto* prod = (Produto*) malloc(sizeof(Produto));
-    int encontrados = 0;
+   Produto* prod;
+    prod = (Produto*) malloc(sizeof(Produto));
+
+    Produto* prod_lista;
 
     system("clear || cls");
     printf("╔═════════════════════════════════════════════════╗\n");
-    printf("║               Produtos Inativos                 ║\n");
+    printf("║                 Produtos Inativos               ║\n");
     printf("╚═════════════════════════════════════════════════╝\n");
+
 
     arquivo = fopen("database/produtos.dat", "rb");
     if (arquivo == NULL) {
@@ -607,17 +604,40 @@ void listar_produtos_inativos(void) {
         return;
     }
 
-    printf("| %-5s | %-20s | %-10s | %-20s | %-15s |\n", "ID", "MODELO", "VALOR", "TIPO", "COR");
-
+    int auxi = 0;
     while (fread(prod, sizeof(Produto), 1, arquivo)) {
         if (prod->status == False) {
-            printf("| %-5d | %-20.20s | %-10.2f | %-20.20s | %-15.15s |\n", prod->id, prod->modelo_rede, prod->valor_rede, prod->tipo_rede, prod->cor_rede);
-            encontrados++;
+            Produto* prod_novo;
+            prod_novo = (Produto*) malloc(sizeof(Produto));
+
+            *prod_novo = *prod;
+            prod_novo->prox = NULL;
+
+            if (auxi == 0) {
+                prod_lista = prod_novo;
+            } else {
+                prod_novo->prox = prod_lista;
+                prod_lista = prod_novo;
+            }
+            auxi++;
         }
     }
+    if (auxi > 0) {
+        Produto* prod_novo = prod_lista;
 
-    if (encontrados == 0) {
-        system("clear || cls");
+        printf("| %-5s | %-20s | %-10s | %-25s | %-15s |\n", "ID", "MODELO", "VALOR", "TIPO", "COR");
+        while(prod_novo != NULL) {
+            printf("| %-5d | %-20.20s | %-10.2f | %-25.20s | %-15.15s |\n", prod_novo->id, prod_novo->modelo_rede, prod_novo->valor_rede, prod_novo->tipo_rede, prod_novo->cor_rede);
+            prod_novo = prod_novo->prox;
+        }
+
+        Produto* atual = prod_lista;
+        while (atual != NULL) { // Limpando a lista
+            Produto* prox = atual->prox;
+            free(atual);
+            atual = prox;
+        }
+    } else {
         printf("\nNenhum produto inativo encontrado.\n");
     }
 
