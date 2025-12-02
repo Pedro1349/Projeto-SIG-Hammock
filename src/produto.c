@@ -591,15 +591,20 @@ Produto* pesquisar_produto_ID(int id) {
 }
 
 char* procurar_nome_produto(int id) {
-    Produto* prod;
-    prod = (Produto*) malloc(sizeof(Produto));
+    Produto prod;
 
-    arquivo_produto = fopen("database/produtos.dat", "rb");
+    FILE* fp = fopen("database/produtos.dat", "rb");
 
-    while(fread(prod, sizeof(Produto), 1, arquivo_produto)) {
-        if (prod->id == id)  {
-            return prod->modelo_rede;
+    if (!fp) return NULL;
+
+    while(fread(&prod, sizeof(Produto), 1, fp)) {
+        if (prod.id == id)  {
+            fclose(fp);
+            char* nome = malloc(strlen(prod.modelo_rede) + 1);
+            strcpy(nome, prod.modelo_rede);
+            return nome;
         }
     }
+    fclose(fp);
     return NULL;
 }

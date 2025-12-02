@@ -870,12 +870,31 @@ void listar_pedidos_ativos(void) {
     printf("| %-10s | %-21s | %-21s | %-21s | %-10s | %-26s |\n", "ID PEDIDO", "NOME CLIENTE", "NOME PRODUTO", "NOME FUNCIONARIO", "PRECO", "DATA");
     while (fread(pedido, sizeof(Pedido), 1, arquivo)) {
         if (pedido->status == True) {
-            strcpy(nome_cliente, procurar_nome_cliente(pedido->id_cliente));
-            strcpy(nome_produto, procurar_nome_produto(pedido->id_produto));
-            strcpy(nome_funcionario, procurar_nome_funcionario(pedido->id_funcionario));
+            char *temp_cli = procurar_nome_cliente(pedido->id_cliente);
+            char *temp_prod = procurar_nome_produto(pedido->id_produto);
+            char *temp_func = procurar_nome_funcionario(pedido->id_funcionario);
+            if (temp_cli == NULL) {
+                printf("\nO cliente desse pedido não foi encontrado.\n");
+                getchar();
+            }
+            else if (temp_prod == NULL) {
+                printf("\nOs produtos desse pedido não foram encontrados.\n");
+                getchar();
+            }
+            else if (temp_func == NULL) {
+                printf("\nO funcionário que fez esse pedido não foi encontrado.\n");
+                getchar();
+            } else {
+                strcpy(nome_cliente, temp_cli);
+                strcpy(nome_produto, temp_prod);
+                strcpy(nome_funcionario, temp_func);
 
-            printf("| %-10d | %-21s | %-21s | %-21s | %-10.2f | %-26.26s |\n", pedido->id_pedido, nome_cliente, nome_produto, nome_funcionario, pedido->preco, pedido->data);
-            encontrados++;
+                printf("| %-10d | %-21.21s | %-21.21s | %-21.21s | %-10.2f | %-26.26s |\n", pedido->id_pedido, nome_cliente, nome_produto, nome_funcionario, pedido->preco, pedido->data);
+                encontrados++;
+            }
+            free(temp_cli);
+            free(temp_prod);
+            free(temp_func);
         }
     }
 
@@ -917,12 +936,31 @@ void listar_pedidos_inativos(void) {
     printf("| %-10s | %-21s | %-21s | %-21s | %-10s | %-26s |\n", "ID PEDIDO", "NOME CLIENTE", "NOME PRODUTO", "NOME FUNCIONARIO", "PRECO", "DATA");
     while (fread(pedido, sizeof(Pedido), 1, arquivo)) {
         if (pedido->status == False) {
-            strcpy(nome_cliente, procurar_nome_cliente(pedido->id_cliente));
-            strcpy(nome_produto, procurar_nome_produto(pedido->id_produto));
-            strcpy(nome_funcionario, procurar_nome_funcionario(pedido->id_funcionario));
+            char *temp_cli = procurar_nome_cliente(pedido->id_cliente);
+            char *temp_prod = procurar_nome_produto(pedido->id_produto);
+            char *temp_func = procurar_nome_funcionario(pedido->id_funcionario);
+            if (temp_cli == NULL) {
+                printf("\nO cliente desse pedido não foi encontrado.\n");
+                getchar();
+            }
+            else if (temp_prod == NULL) {
+                printf("\nOs produtos desse pedido não foram encontrados.\n");
+                getchar();
+            }
+            else if (temp_func == NULL) {
+                printf("\nO funcionário que fez esse pedido não foi encontrado.\n");
+                getchar();
+            } else {
+                strcpy(nome_cliente, temp_cli);
+                strcpy(nome_produto, temp_prod);
+                strcpy(nome_funcionario, temp_func);
 
-            printf("| %-10d | %-21s | %-21s | %-21s | %-10.2f | %-26.26s |\n", pedido->id_pedido, nome_cliente, nome_produto, nome_funcionario, pedido->preco, pedido->data);
-            encontrados++;
+                printf("| %-10d | %-21.21s | %-21.21s | %-21.21s | %-10.2f | %-26.26s |\n", pedido->id_pedido, nome_cliente, nome_produto, nome_funcionario, pedido->preco, pedido->data);
+                encontrados++;
+            }
+            free(temp_cli);
+            free(temp_prod);
+            free(temp_func);
         }
     }
 

@@ -543,15 +543,20 @@ void alterar_campo_funcionario(Funcionarios *func, char opc_alterar) {
 }
 
 char* procurar_nome_funcionario(int id) {
-    Funcionarios* func;
-    func = (Funcionarios*) malloc(sizeof(Funcionarios));
+    Funcionarios func;
+    
+    FILE* fp = fopen("database/funcionarios.dat", "rb");
 
-    arquivo_funcionario = fopen("database/funcionarios.dat", "rb");
+    if (!fp) return NULL;
 
-    while(fread(func, sizeof(Funcionarios), 1, arquivo_funcionario)) {
-        if (func->id == id)  {
-            return func->nome;
+    while(fread(&func, sizeof(Funcionarios), 1, fp)) {
+        if (func.id == id)  {
+            fclose(fp);
+            char* nome = malloc(strlen(func.nome) + 1);
+            strcpy(nome, func.nome);
+            return nome;
         }
     }
+    fclose(fp);
     return NULL;
 }
