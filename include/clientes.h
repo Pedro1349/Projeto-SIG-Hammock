@@ -7,6 +7,7 @@ struct cliente {
     char email[51];
     char telefone[12];
     int status;
+    Cliente* prox;
 };
 
 char tela_de_clientes(void);

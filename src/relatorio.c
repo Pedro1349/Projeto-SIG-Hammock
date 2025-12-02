@@ -48,7 +48,9 @@ void navegacao_relatorios_clientes(void) {
             case '3':
                 filtrar_clientes_nome();
                 break;
-           
+            case '4':
+                listar_clientes_ordenados();
+                break;
         }
     } while (opcao != '0');
 }
@@ -147,6 +149,7 @@ char tela_relatorio_clientes(void){
     printf("║ 1 - Listar clientes ativos                      ║\n");
     printf("║ 2 - Listar clientes inativos                    ║\n");
     printf("║ 3 - Filtrar clientes por nome                   ║\n");
+    printf("║ 4 - Listar clientes em ordem alfabética         ║\n");
     printf("║                                                 ║\n");
     printf("╠═════════════════════════════════════════════════╣\n");
     printf("║ 0 - Voltar                                      ║\n");
@@ -225,17 +228,15 @@ char tela_relatorio_pedidos(void){
     return op_pedido;
 }
 
-// ============================================================
-// LISTAR CLIENTES ATIVOS
-// ============================================================
+// LISTAR CLIENTES ATIVOS – LISTA DINÂMICA DIRETA
 void listar_clientes_ativos(void) {
-    Cliente* cli;
-    cli = (Cliente*) malloc(sizeof(Cliente));
-    int encontrados = 0;
+    Cliente* cli = (Cliente*) malloc(sizeof(Cliente));
+    Cliente* lista = NULL;
+    Cliente* ultimo = NULL;
 
     system("clear || cls");
     printf("╔═════════════════════════════════════════════════╗\n");
-    printf("║              Clientes Ativos                    ║\n");
+    printf("║                 Clientes Ativos                 ║\n");
     printf("╚═════════════════════════════════════════════════╝\n");
 
     arquivo = fopen("database/clientes.dat", "rb");
@@ -246,38 +247,67 @@ void listar_clientes_ativos(void) {
         return;
     }
 
-    printf("| %-5s | %-20s | %-14s | %-25s | %-12s |\n", "ID", "NOME", "CPF", "EMAIL", "TELEFONE");
+    int qtd = 0;
+
+    // MONTANDO LISTA DINÂMICA DIRETA
     while (fread(cli, sizeof(Cliente), 1, arquivo)) {
         if (cli->status == True) {
-            printf("| %-5d | %-20.20s | %-14.14s | %-25.25s | %-12.12s |\n", cli->id, cli->nome, cli->cpf, cli->email, cli->telefone);
-            encontrados++;
-        }
-    }
+            Cliente* novo = (Cliente*) malloc(sizeof(Cliente));
+            *novo = *cli;
+            novo->prox = NULL;
 
-    if (encontrados == 0) {
-        system("clear || cls");
-        printf("\nNenhum cliente ativo encontrado.\n");
+            if (qtd == 0) {
+                lista = novo;
+                ultimo = novo;
+            } else {
+                ultimo->prox = novo;
+                ultimo = novo;
+            }
+            qtd++;
+        }
     }
 
     fclose(arquivo);
     free(cli);
 
-    printf("\n\nPressione ENTER para continuar...");
+    if (qtd == 0) {
+        printf("\nNenhum cliente ativo encontrado.\n");
+        printf("\nPressione ENTER para continuar...");
+        getchar();
+        return;
+    }
+
+    // EXIBINDO LISTA
+    printf("| %-5s | %-20s | %-14s | %-25s | %-12s |\n", 
+           "ID", "NOME", "CPF", "EMAIL", "TELEFONE");
+
+    Cliente* atual = lista;
+    while (atual != NULL) {
+        printf("| %-5d | %-20.20s | %-14.14s | %-25.25s | %-12.12s |\n",
+               atual->id, atual->nome, atual->cpf, atual->email, atual->telefone);
+        atual = atual->prox;
+    }
+
+    // LIBERANDO LISTA
+    atual = lista;
+    while (atual != NULL) {
+        Cliente* prox = atual->prox;
+        free(atual);
+        atual = prox;
+    }
+
+    printf("\nPressione ENTER para continuar...");
     getchar();
 }
 
-
-// ============================================================
-// LISTAR CLIENTES INATIVOS
-// ============================================================
+// LISTAR CLIENTES INATIVOS – LISTA DINÂMICA REVERSA
 void listar_clientes_inativos(void) {
-    Cliente* cli;
-    cli = (Cliente*) malloc(sizeof(Cliente));
-    int encontrados = 0;
+    Cliente* cli = (Cliente*) malloc(sizeof(Cliente));
+    Cliente* lista = NULL;
 
     system("clear || cls");
     printf("╔═════════════════════════════════════════════════╗\n");
-    printf("║              Clientes Inativos                  ║\n");
+    printf("║                Clientes Inativos                ║\n");
     printf("╚═════════════════════════════════════════════════╝\n");
 
     arquivo = fopen("database/clientes.dat", "rb");
@@ -288,25 +318,132 @@ void listar_clientes_inativos(void) {
         return;
     }
 
-    printf("| %-5s | %-20s | %-14s | %-25s | %-12s |\n", "ID", "NOME", "CPF", "EMAIL", "TELEFONE");
+    int qtd = 0;
+
+    // LISTA REVERSA (insere sempre no início)
     while (fread(cli, sizeof(Cliente), 1, arquivo)) {
         if (cli->status == False) {
-            printf("| %-5d | %-20.20s | %-14.14s | %-25.25s | %-12.12s |\n", cli->id, cli->nome, cli->cpf, cli->email, cli->telefone);
-            encontrados++;
+            Cliente* novo = (Cliente*) malloc(sizeof(Cliente));
+            *novo = *cli;
+            novo->prox = lista;
+            lista = novo;
+            qtd++;
         }
-    }
-
-    if (encontrados == 0) {
-        system("clear || cls");
-        printf("\nNenhum cliente inativo encontrado.\n");
     }
 
     fclose(arquivo);
     free(cli);
 
-    printf("\n\nPressione ENTER para continuar...");
+    if (qtd == 0) {
+        printf("\nNenhum cliente inativo encontrado.\n");
+        printf("\nPressione ENTER para continuar...");
+        getchar();
+        return;
+    }
+
+    // EXIBINDO LISTA
+    printf("| %-5s | %-20s | %-14s | %-25s | %-12s |\n",
+           "ID", "NOME", "CPF", "EMAIL", "TELEFONE");
+
+    Cliente* atual = lista;
+    while (atual != NULL) {
+        printf("| %-5d | %-20.20s | %-14.14s | %-25.25s | %-12.12s |\n",
+               atual->id, atual->nome, atual->cpf, atual->email, atual->telefone);
+        atual = atual->prox;
+    }
+
+    // LIBERANDO LISTA
+    atual = lista;
+    while (atual != NULL) {
+        Cliente* prox = atual->prox;
+        free(atual);
+        atual = prox;
+    }
+
+    printf("\nPressione ENTER para continuar...");
     getchar();
 }
+
+// LISTAR CLIENTES ATIVOS EM ORDEM ALFABÉTICA
+void listar_clientes_ordenados(void) {
+    Cliente* cli = (Cliente*) malloc(sizeof(Cliente));
+    Cliente* lista = NULL;
+
+    system("clear || cls");
+    printf("╔═════════════════════════════════════════════════╗\n");
+    printf("║      Clientes Ativos em Ordem Alfabética        ║\n");
+    printf("╚═════════════════════════════════════════════════╝\n");
+
+    arquivo = fopen("database/clientes.dat", "rb");
+    if (arquivo == NULL) {
+        printf("\nNenhum cliente encontrado (arquivo inexistente).\n");
+        getchar();
+        free(cli);
+        return;
+    }
+
+    int qtd = 0;
+
+    // MONTAR LISTA ORDENADA POR NOME
+    while (fread(cli, sizeof(Cliente), 1, arquivo)) {
+        if (cli->status == True) {
+
+            // Criar nó
+            Cliente* novo = (Cliente*) malloc(sizeof(Cliente));
+            *novo = *cli;
+            novo->prox = NULL;
+
+            // Inserção na lista ordenada
+            if (lista == NULL || strcmp(novo->nome, lista->nome) < 0) {
+                novo->prox = lista;
+                lista = novo;
+            } else {
+                Cliente* atual = lista;
+                while (atual->prox != NULL && strcmp(atual->prox->nome, novo->nome) < 0) {
+                    atual = atual->prox;
+                }
+                novo->prox = atual->prox;
+                atual->prox = novo;
+            }
+
+            qtd++;
+        }
+    }
+
+    fclose(arquivo);
+    free(cli);
+
+    if (qtd == 0) {
+        printf("\nNenhum cliente ativo encontrado.\n");
+        printf("\nPressione ENTER para continuar...");
+        getchar();
+        return;
+    }
+
+    // EXIBIR LISTA
+    printf("| %-5s | %-20s | %-14s | %-25s | %-12s |\n",
+           "ID", "NOME", "CPF", "EMAIL", "TELEFONE");
+
+    Cliente* atual = lista;
+    while (atual != NULL) {
+        printf("| %-5d | %-20.20s | %-14.14s | %-25.25s | %-12.12s |\n",
+               atual->id, atual->nome, atual->cpf, atual->email, atual->telefone);
+        atual = atual->prox;
+    }
+
+    // LIBERAR LISTA
+    atual = lista;
+    while (atual != NULL) {
+        Cliente* prox = atual->prox;
+        free(atual);
+        atual = prox;
+    }
+
+    printf("\nPressione ENTER para continuar...");
+    getchar();
+}
+
+
 
 // ============================================================
 // FILTRAR CLIENTES POR NOME

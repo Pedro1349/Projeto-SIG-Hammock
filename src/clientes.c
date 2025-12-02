@@ -9,7 +9,6 @@
 
 FILE * arquivo_cliente; //Apontador do arquivo
 
-#define MAX_CLIENTES 100
 
 void modulo_clientes(void){
     char opcao;
@@ -547,15 +546,20 @@ void alterar_campo_cliente(Cliente* cli, char opc_alterar) {
 }
 
 char* procurar_nome_cliente(int id) {
-    Cliente* cli;
-    cli = (Cliente*) malloc(sizeof(Cliente));
+    Cliente cli;
+    FILE* fp = fopen("database/clientes.dat", "rb");
 
-    arquivo_cliente = fopen("database/clientes.dat", "rb");
+    if (!fp) return NULL;
 
-    while(fread(cli, sizeof(Cliente), 1, arquivo_cliente)) {
-        if (cli->id == id)  {
-            return cli->nome;
+    while (fread(&cli, sizeof(Cliente), 1, fp)) {
+        if (cli.id == id) {
+            fclose(fp);
+            char* nome = malloc(strlen(cli.nome) + 1);
+            strcpy(nome, cli.nome);
+            return nome;
         }
     }
+
+    fclose(fp);
     return NULL;
 }

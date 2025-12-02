@@ -13,6 +13,7 @@ char tela_relatorio_pedidos(void);
 //==================================
 void listar_clientes_ativos(void);
 void listar_clientes_inativos(void);
+void listar_clientes_ordenados(void);
 void listar_funcionarios_ativos(void);
 void listar_funcionarios_inativos(void);
 void listar_pedidos_ativos(void);
